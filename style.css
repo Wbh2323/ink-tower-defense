@@ -4,6 +4,10 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
 }
 html, body {
     width: 100%;
@@ -12,8 +16,8 @@ html, body {
     background: #1a1a1a;
     font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif;
     color: #e8dcc8;
-    user-select: none;
-    -webkit-user-select: none;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* ===== 游戏容器 ===== */

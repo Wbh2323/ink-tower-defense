@@ -1356,12 +1356,17 @@
     //  尺寸自适应
     // ============================================================
     let resizeTimer = null;
+    let lastResizeTime = 0;
     function resize() {
         // 防抖：移动端地址栏变化会频繁触发resize
+        // Safari需要更长的防抖时间
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const delay = isSafari ? 500 : 200;
+
         if (resizeTimer) clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
             doResize();
-        }, 200);
+        }, delay);
     }
 
     function doResize() {
@@ -1483,6 +1488,26 @@
             ctx.restore();
         }
     }
+
+    // ============================================================
+    //  Safari专用：阻止双指缩放导致页面重载
+    // ============================================================
+    document.addEventListener('gesturestart', function(e) {
+        e.preventDefault();
+    });
+    document.addEventListener('gesturechange', function(e) {
+        e.preventDefault();
+    });
+    document.addEventListener('gestureend', function(e) {
+        e.preventDefault();
+    });
+
+    // 阻止touchmove默认行为（防止Safari橡皮筋效果）
+    document.addEventListener('touchmove', function(e) {
+        if (e.target === canvas) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 
     // ============================================================
     //  初始化
