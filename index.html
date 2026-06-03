@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>墨韵守关 - 水墨国风汉字塔防</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <div id="top-bar">
+            <div class="stat">
+                <span class="stat-label">💰 金币</span>
+                <span id="gold-display">200</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">❤️ 基地</span>
+                <span id="hp-display">20</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">🌊 波次</span>
+                <span id="wave-display">0 / 10</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">⚔️ 击杀</span>
+                <span id="kill-display">0</span>
+            </div>
+        </div>
+        <div id="main-area">
+            <canvas id="gameCanvas"></canvas>
+            <div id="tower-panel">
+                <div class="panel-title">造塔</div>
+                <div class="tower-btn" data-tower="刀" data-cost="40">
+                    <span class="tower-char">刀</span>
+                    <span class="tower-cost">40金</span>
+                    <span class="tower-desc">单体高伤</span>
+                </div>
+                <div class="tower-btn" data-tower="弓" data-cost="48">
+                    <span class="tower-char">弓</span>
+                    <span class="tower-cost">48金</span>
+                    <span class="tower-desc">远程穿刺</span>
+                </div>
+                <div class="tower-btn" data-tower="盾" data-cost="56">
+                    <span class="tower-char">盾</span>
+                    <span class="tower-cost">56金</span>
+                    <span class="tower-desc">范围减速</span>
+                </div>
+                <div class="tower-btn" data-tower="火" data-cost="80">
+                    <span class="tower-char">火</span>
+                    <span class="tower-cost">80金</span>
+                    <span class="tower-desc">范围群伤</span>
+                </div>
+                <div class="tower-btn" data-tower="水" data-cost="72">
+                    <span class="tower-char">水</span>
+                    <span class="tower-cost">72金</span>
+                    <span class="tower-desc">持续腐蚀</span>
+                </div>
+                <div class="tower-btn" data-tower="雷" data-cost="96">
+                    <span class="tower-char">雷</span>
+                    <span class="tower-cost">96金</span>
+                    <span class="tower-desc">连锁闪电</span>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="tower-btn" data-tower="剑" data-cost="80">
+                    <span class="tower-char">剑</span>
+                    <span class="tower-cost">80金</span>
+                    <span class="tower-desc">快速连击</span>
+                </div>
+                <div class="tower-btn" data-tower="影" data-cost="80">
+                    <span class="tower-char">影</span>
+                    <span class="tower-cost">80金</span>
+                    <span class="tower-desc">暗影穿透</span>
+                </div>
+                <div class="panel-divider"></div>
+                <div id="selected-info"></div>
+                <div class="action-btns" id="action-btns" style="display:none;">
+                    <button id="upgrade-btn" class="action-btn">⬆ 升级</button>
+                    <button id="sell-btn" class="action-btn">💰 出售</button>
+                </div>
+                <div class="panel-divider"></div>
+                <button id="wave-btn" class="ctrl-btn">▶ 出波</button>
+                <button id="auto-wave-btn" class="ctrl-btn">🔄 自动出波</button>
+                <div class="speed-row">
+                    <button id="pause-btn" class="ctrl-btn small">⏸</button>
+                    <button id="speed1-btn" class="ctrl-btn small active">1x</button>
+                    <button id="speed2-btn" class="ctrl-btn small">2x</button>
+                    <button id="speed3-btn" class="ctrl-btn small">3x</button>
+                </div>
+                <div class="synergy-info" id="synergy-info"></div>
+            </div>
+        </div>
+    </div>
+    <div id="game-over-overlay" style="display:none;">
+        <div id="game-over-box">
+            <div id="game-over-title"></div>
+            <div id="game-over-stats"></div>
+            <button id="restart-btn" class="ctrl-btn">重新开始</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>

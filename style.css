@@ -1,0 +1,320 @@
+/* ===== 基础重置 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #1a1a1a;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+    color: #e8dcc8;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ===== 游戏容器 ===== */
+#game-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #2a2520 0%, #1e1c18 50%, #2a2520 100%);
+}
+
+/* ===== 顶部状态栏 ===== */
+#top-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 6px 10px;
+    background: rgba(30, 25, 20, 0.95);
+    border-bottom: 2px solid rgba(180, 160, 120, 0.3);
+    flex-shrink: 0;
+    z-index: 10;
+}
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+}
+.stat-label {
+    font-size: 12px;
+    color: #a09080;
+    letter-spacing: 1px;
+}
+.stat span:last-child {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f0e6d0;
+    text-shadow: 0 0 8px rgba(200, 180, 140, 0.4);
+}
+
+/* ===== 主区域 ===== */
+#main-area {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ===== Canvas ===== */
+#gameCanvas {
+    flex: 1;
+    display: block;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+/* ===== 右侧塔面板 ===== */
+#tower-panel {
+    width: 140px;
+    background: rgba(25, 22, 18, 0.95);
+    border-left: 2px solid rgba(180, 160, 120, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 6px;
+    overflow-y: auto;
+    flex-shrink: 0;
+    z-index: 10;
+}
+.panel-title {
+    font-size: 18px;
+    color: #d4c4a0;
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+    text-shadow: 0 0 6px rgba(180, 160, 120, 0.3);
+}
+
+/* ===== 塔按钮 ===== */
+.tower-btn {
+    width: 120px;
+    padding: 6px 8px;
+    margin: 3px 0;
+    background: rgba(60, 50, 40, 0.6);
+    border: 1px solid rgba(180, 160, 120, 0.25);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.2s;
+    position: relative;
+}
+.tower-btn:hover {
+    background: rgba(80, 70, 50, 0.8);
+    border-color: rgba(200, 180, 120, 0.6);
+    transform: scale(1.03);
+}
+.tower-btn.selected {
+    background: rgba(120, 100, 60, 0.5);
+    border-color: #d4a840;
+    box-shadow: 0 0 10px rgba(200, 160, 60, 0.3);
+}
+.tower-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.tower-char {
+    font-size: 28px;
+    color: #f0e6d0;
+    text-shadow: 0 0 12px rgba(200, 180, 140, 0.5);
+    line-height: 1.2;
+}
+.tower-cost {
+    font-size: 12px;
+    color: #c8b880;
+}
+.tower-desc {
+    font-size: 11px;
+    color: #908060;
+}
+
+/* ===== 分割线 ===== */
+.panel-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(180, 160, 120, 0.2);
+    margin: 6px 0;
+}
+
+/* ===== 选中信息 ===== */
+#selected-info {
+    width: 120px;
+    text-align: center;
+    font-size: 13px;
+    color: #c8b880;
+    min-height: 20px;
+}
+
+/* ===== 操作按钮 ===== */
+.action-btns {
+    display: flex;
+    gap: 4px;
+    width: 120px;
+    justify-content: center;
+}
+.action-btn {
+    padding: 4px 10px;
+    background: rgba(80, 60, 40, 0.7);
+    border: 1px solid rgba(180, 160, 120, 0.3);
+    border-radius: 3px;
+    color: #e0d0b0;
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.action-btn:hover {
+    background: rgba(120, 90, 50, 0.7);
+    border-color: #d4a840;
+}
+
+/* ===== 控制按钮 ===== */
+.ctrl-btn {
+    width: 120px;
+    padding: 8px;
+    margin: 3px 0;
+    background: rgba(60, 50, 40, 0.7);
+    border: 1px solid rgba(180, 160, 120, 0.3);
+    border-radius: 4px;
+    color: #e0d0b0;
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 2px;
+}
+.ctrl-btn:hover {
+    background: rgba(100, 80, 50, 0.8);
+    border-color: rgba(200, 180, 120, 0.5);
+}
+.ctrl-btn.active {
+    background: rgba(140, 110, 50, 0.5);
+    border-color: #d4a840;
+    color: #ffe0a0;
+}
+.ctrl-btn.small {
+    width: 36px;
+    padding: 6px;
+    font-size: 14px;
+    margin: 0;
+}
+.speed-row {
+    display: flex;
+    gap: 4px;
+    width: 120px;
+    justify-content: center;
+}
+
+/* ===== 羁绊信息 ===== */
+.synergy-info {
+    width: 120px;
+    font-size: 11px;
+    color: #a09070;
+    text-align: center;
+    margin-top: 4px;
+    min-height: 16px;
+}
+
+/* ===== 游戏结束遮罩 ===== */
+#game-over-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+#game-over-box {
+    background: rgba(30, 25, 20, 0.95);
+    border: 2px solid rgba(180, 160, 120, 0.5);
+    border-radius: 8px;
+    padding: 30px 40px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
+#game-over-title {
+    font-size: 36px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 20px rgba(200, 160, 60, 0.5);
+}
+#game-over-stats {
+    font-size: 16px;
+    color: #c8b880;
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+#restart-btn {
+    padding: 10px 30px;
+    font-size: 20px;
+    font-family: 'Ma Shan Zheng', serif;
+    background: rgba(80, 60, 40, 0.7);
+    border: 1px solid rgba(200, 180, 120, 0.4);
+    border-radius: 4px;
+    color: #f0e6d0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+#restart-btn:hover {
+    background: rgba(120, 90, 50, 0.7);
+    border-color: #d4a840;
+}
+
+/* ===== 手机适配 ===== */
+@media (max-width: 700px) {
+    #top-bar {
+        padding: 4px 6px;
+    }
+    .stat-label { font-size: 10px; }
+    .stat span:last-child { font-size: 16px; }
+    #tower-panel {
+        width: 110px;
+        padding: 4px 3px;
+    }
+    .tower-btn { width: 100px; padding: 4px; margin: 2px 0; }
+    .tower-char { font-size: 22px; }
+    .tower-cost { font-size: 10px; }
+    .tower-desc { font-size: 9px; }
+    .ctrl-btn { width: 100px; font-size: 14px; padding: 6px; }
+    .ctrl-btn.small { width: 30px; font-size: 12px; }
+    .panel-title { font-size: 15px; }
+    .speed-row { width: 100px; }
+    .action-btn { font-size: 12px; padding: 3px 6px; }
+    .action-btns { width: 100px; }
+    #selected-info { width: 100px; font-size: 11px; }
+    .synergy-info { width: 100px; font-size: 10px; }
+}
+
+@media (max-width: 480px) {
+    #tower-panel {
+        width: 90px;
+        padding: 3px 2px;
+    }
+    .tower-btn { width: 80px; }
+    .tower-char { font-size: 20px; }
+    .ctrl-btn { width: 80px; font-size: 12px; }
+    .ctrl-btn.small { width: 24px; }
+    .speed-row { width: 80px; }
+    .action-btns { width: 80px; }
+    #selected-info { width: 80px; }
+    .synergy-info { width: 80px; }
+}
+
+/* ===== 滚动条美化 ===== */
+#tower-panel::-webkit-scrollbar {
+    width: 4px;
+}
+#tower-panel::-webkit-scrollbar-track {
+    background: rgba(30, 25, 20, 0.5);
+}
+#tower-panel::-webkit-scrollbar-thumb {
+    background: rgba(180, 160, 120, 0.3);
+    border-radius: 2px;
+}
