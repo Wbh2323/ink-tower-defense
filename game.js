@@ -5,6 +5,14 @@
 (function () {
     'use strict';
 
+    // ---------- 全局错误捕获 ----------
+    window.addEventListener('error', function(e) {
+        console.error('Game Error:', e.message, e.filename, e.lineno);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled Promise Rejection:', e.reason);
+    });
+
     // ---------- Canvas & Context ----------
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -420,7 +428,7 @@
             // 持续伤害
             if (e.dotTimer > 0) {
                 e.dotTimer -= dt;
-                e.hp -= e.dotDmg * dt;
+                e.hp -= (e.dotDmg || 0) * dt;
                 if (e.dotTimer <= 0) {
                     e.dotDmg = 0;
                 }
@@ -638,6 +646,7 @@
         const hit = new Set();
         let current = target;
         let remaining = tower.chainCount;
+        let prevX = tower.x, prevY = tower.y;
 
         for (let i = 0; i <= remaining && current; i++) {
             if (!current.alive) break;
@@ -647,18 +656,16 @@
             hit.add(current);
 
             // 闪电线
-            if (i > 0 || current !== target) {
-                const prev = i === 0 ? target : current;
-                // 找下一个目标
-            }
             lightnings.push({
-                x1: i === 0 ? tower.x : (current ? current.x : tower.x),
-                y1: i === 0 ? tower.y : (current ? current.y : tower.y),
+                x1: prevX,
+                y1: prevY,
                 x2: current.x,
                 y2: current.y,
                 life: 0.3,
                 color: '#c0b0ff'
             });
+            prevX = current.x;
+            prevY = current.y;
 
             // 寻找下一个链式目标
             let nextTarget = null;
@@ -694,6 +701,10 @@
                     p.target.hitFlash = 1;
                     addFloatingText(p.target.x, p.target.y - 10, '-' + p.damage, p.color);
                     spawnInkSplash(p.target.x, p.target.y, p.color, 3);
+                } else if (p.target && !p.target.alive) {
+                    // 目标已死亡，直接销毁弹道
+                    p.alive = false;
+                    return;
                 }
 
                 // AOE
@@ -805,7 +816,11 @@
     //  粒子系统
     // ============================================================
     function spawnInkSplash(x, y, color, count) {
+        // 粒子数量上限，防止内存泄漏
+        const MAX_PARTICLES = 300;
+        if (particles.length >= MAX_PARTICLES) return;
         for (let i = 0; i < count; i++) {
+            if (particles.length >= MAX_PARTICLES) break;
             const angle = Math.random() * Math.PI * 2;
             const speed = 30 + Math.random() * 60;
             particles.push({
@@ -1294,12 +1309,13 @@
     //  辅助函数
     // ============================================================
     function blendColor(c1, c2, ratio) {
-        const r1 = parseInt(c1.slice(1, 3), 16);
-        const g1 = parseInt(c1.slice(3, 5), 16);
-        const b1 = parseInt(c1.slice(5, 7), 16);
-        const r2 = parseInt(c2.slice(1, 3), 16);
-        const g2 = parseInt(c2.slice(3, 5), 16);
-        const b2 = parseInt(c2.slice(5, 7), 16);
+        if (!c1 || !c2 || c1.length < 7 || c2.length < 7) return '#ffffff';
+        const r1 = parseInt(c1.slice(1, 3), 16) || 0;
+        const g1 = parseInt(c1.slice(3, 5), 16) || 0;
+        const b1 = parseInt(c1.slice(5, 7), 16) || 0;
+        const r2 = parseInt(c2.slice(1, 3), 16) || 0;
+        const g2 = parseInt(c2.slice(3, 5), 16) || 0;
+        const b2 = parseInt(c2.slice(5, 7), 16) || 0;
         const r = Math.floor(r1 + (r2 - r1) * ratio);
         const g = Math.floor(g1 + (g2 - g1) * ratio);
         const b = Math.floor(b1 + (b2 - b1) * ratio);
@@ -1351,37 +1367,41 @@
     function gameLoop(timestamp) {
         requestAnimationFrame(gameLoop);
 
-        const rawDt = Math.min((timestamp - lastTime) / 1000, 0.1);
-        lastTime = timestamp;
+        try {
+            const rawDt = Math.min((timestamp - lastTime) / 1000, 0.1);
+            lastTime = timestamp;
 
-        if (paused || gameOver) {
-            // 仍然绘制
+            if (paused || gameOver) {
+                // 仍然绘制
+                render(timestamp / 1000);
+                return;
+            }
+
+            const dt = rawDt * gameSpeed;
+
+            // 更新
+            updateClouds(dt);
+            updateWave(dt);
+            updateTowers(dt);
+            updateEnemies(dt);
+            updateProjectiles(dt);
+            updateLightnings(dt);
+            updateParticles(dt);
+            updateFloatingTexts(dt);
+
+            if (ultimateTimer > 0) ultimateTimer -= dt;
+
+            // 定期更新UI
+            uiUpdateTimer += rawDt;
+            if (uiUpdateTimer > 0.2) {
+                uiUpdateTimer = 0;
+                updateUI();
+            }
+
             render(timestamp / 1000);
-            return;
+        } catch (e) {
+            console.error('GameLoop Error:', e);
         }
-
-        const dt = rawDt * gameSpeed;
-
-        // 更新
-        updateClouds(dt);
-        updateWave(dt);
-        updateTowers(dt);
-        updateEnemies(dt);
-        updateProjectiles(dt);
-        updateLightnings(dt);
-        updateParticles(dt);
-        updateFloatingTexts(dt);
-
-        if (ultimateTimer > 0) ultimateTimer -= dt;
-
-        // 定期更新UI
-        uiUpdateTimer += rawDt;
-        if (uiUpdateTimer > 0.2) {
-            uiUpdateTimer = 0;
-            updateUI();
-        }
-
-        render(timestamp / 1000);
     }
 
     function render(time) {
