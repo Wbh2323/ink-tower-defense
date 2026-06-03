@@ -1335,7 +1335,8 @@
             t.y = (t.row + 0.5) * CELL + offsetY;
         });
 
-        initClouds();
+        // 只在首次初始化时创建云雾，resize时不重置
+        if (clouds.length === 0) initClouds();
     }
 
     window.addEventListener('resize', resize);
@@ -1345,6 +1346,7 @@
     // ============================================================
     let lastTime = 0;
     let uiUpdateTimer = 0;
+    let loopStarted = false;
 
     function gameLoop(timestamp) {
         requestAnimationFrame(gameLoop);
@@ -1423,18 +1425,24 @@
     // ============================================================
     //  初始化
     // ============================================================
+    let inited = false;
     function init() {
+        if (inited) return;
+        inited = true;
         resize();
         updateUI();
         lastTime = performance.now();
-        requestAnimationFrame(gameLoop);
+        if (!loopStarted) {
+            loopStarted = true;
+            requestAnimationFrame(gameLoop);
+        }
     }
 
     // 等待字体加载
     if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(init);
-    } else {
-        window.addEventListener('load', init);
     }
+    // 备用：window.load 也触发，但用 inited 防止重复
+    window.addEventListener('load', init);
 
 })();
