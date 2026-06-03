@@ -1229,8 +1229,14 @@
     });
 
     // 触摸支持
+    let touchHandled = false;
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        touchHandled = true;
+        // 阻止后续的click事件模拟
+        setTimeout(() => { touchHandled = false; }, 300);
+
         if (gameOver) return;
         const touch = e.touches[0];
         const pos = getGridPos(touch.clientX, touch.clientY);
@@ -1251,6 +1257,15 @@
         }
         updateUI();
     }, { passive: false });
+
+    // 阻止canvas上的click事件（移动端会模拟click，导致重复触发）
+    canvas.addEventListener('click', (e) => {
+        if (touchHandled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+    });
 
     // 塔按钮
     document.querySelectorAll('.tower-btn[data-tower]').forEach(btn => {
@@ -1305,6 +1320,21 @@
     // 重新开始
     document.getElementById('restart-btn').addEventListener('click', restartGame);
 
+    // 页面可见性变化：切后台时暂停，返回时恢复（不重置游戏）
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            // 切到后台时自动暂停
+            if (!paused && !gameOver) {
+                paused = true;
+                document.getElementById('pause-btn').textContent = '▶';
+                document.getElementById('pause-btn').classList.add('active');
+            }
+        } else {
+            // 返回前台时恢复（如果之前是自动暂停的）
+            // 不自动恢复，让用户手动点击继续，避免时间跳跃导致的问题
+        }
+    });
+
     // ============================================================
     //  辅助函数
     // ============================================================
@@ -1325,15 +1355,27 @@
     // ============================================================
     //  尺寸自适应
     // ============================================================
+    let resizeTimer = null;
     function resize() {
+        // 防抖：移动端地址栏变化会频繁触发resize
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            doResize();
+        }, 200);
+    }
+
+    function doResize() {
         const container = document.getElementById('main-area');
         const panel = document.getElementById('tower-panel');
         const panelW = panel ? panel.offsetWidth : 140;
         const w = container.clientWidth - panelW;
         const h = container.clientHeight;
 
-        canvas.width = w;
-        canvas.height = h;
+        // 只在尺寸真正变化时才重置canvas，避免移动端地址栏变化导致的问题
+        if (canvas.width !== w || canvas.height !== h) {
+            canvas.width = w;
+            canvas.height = h;
+        }
 
         // 计算格子大小
         const cellW = w / COLS;
